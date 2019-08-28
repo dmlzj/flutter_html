@@ -341,6 +341,22 @@ class HtmlRichTextParser extends StatelessWidget {
       children: children,
     );
   }
+  // 处理宽度px and % 为字符串
+  String formatPxOrPercent(String pxStr) {
+    pxStr = pxStr.toLowerCase();
+    if (pxStr.endsWith('px')) {
+      int index = pxStr.indexOf('px');
+      return pxStr.substring(0, index);
+    } else if (pxStr.endsWith('%')) {
+      int index = pxStr.indexOf('%');
+      String str = pxStr.substring(0, index);
+      double res = (double.parse(str) / 100) * 375;
+      return res.toString();
+    } else {
+      return pxStr;
+    }
+    // return pxStr;
+  }
 
   // THE WORKHORSE FUNCTION!!
   // call the function with the current node and a ParseContext
@@ -749,11 +765,11 @@ class HtmlRichTextParser extends StatelessWidget {
                           node.attributes['src'].split("base64,")[1].trim()),
                       width: imageProperties?.width ??
                           ((node.attributes['width'] != null)
-                              ? double.tryParse(node.attributes['width'])
+                              ? double.tryParse(formatPxOrPercent(node.attributes['width']))
                               : null),
                       height: imageProperties?.height ??
                           ((node.attributes['height'] != null)
-                              ? double.tryParse(node.attributes['height'])
+                              ? double.tryParse(formatPxOrPercent(node.attributes['height']))
                               : null),
                       scale: imageProperties?.scale ?? 1.0,
                       matchTextDirection:
@@ -789,11 +805,11 @@ class HtmlRichTextParser extends StatelessWidget {
                       node.attributes['src'],
                       width: imageProperties?.width ??
                           ((node.attributes['width'] != null)
-                              ? double.parse(node.attributes['width'])
+                              ? double.tryParse(formatPxOrPercent(node.attributes['width']))
                               : null),
                       height: imageProperties?.height ??
                           ((node.attributes['height'] != null)
-                              ? double.parse(node.attributes['height'])
+                              ? double.tryParse(formatPxOrPercent(node.attributes['height']))
                               : null),
                       scale: imageProperties?.scale ?? 1.0,
                       matchTextDirection:
